@@ -10,14 +10,14 @@
 8. Track Notification Status.
 
 
-Non-functional Requirements
+**Non-functional Requirements**
 
 1. Thread Safety : Support Concurrent notification submission safely.
 2. Responsiveness: Process notifications Asynchronusly.
 3. Extensiblity: Easy to add new channels.
 4. Maintanablity: Easy to extend/new Implementation using interfaces.
 
-Identifying Core API's/Functions and Entities
+**Identifying Core API's/Functions and Entities**
 
 Functions/API's
 
