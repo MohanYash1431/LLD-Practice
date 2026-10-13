@@ -5,16 +5,25 @@ public sealed class FakePaymentGateway : IPaymentGateway
     private readonly HashSet<string> _charged = new();
     private readonly HashSet<string> _refunded = new();
 
-    private bool _loseFirstResponse;
-    private readonly bool _decline;
+    private int _lostResponsesRemaining;
+    private int _chargeCallCount;
 
+    private readonly bool _decline;
     private readonly object _lock = new();
 
     public FakePaymentGateway(
         bool loseFirstResponse = false,
-        bool decline = false)
+        bool decline = false,
+        int lostResponseCount = 0)
     {
-        _loseFirstResponse = loseFirstResponse;
+        if (lostResponseCount < 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(lostResponseCount));
+
+        _lostResponsesRemaining = Math.Max(
+            lostResponseCount,
+            loseFirstResponse ? 1 : 0);
+
         _decline = decline;
     }
 
@@ -24,16 +33,18 @@ public sealed class FakePaymentGateway : IPaymentGateway
     {
         lock (_lock)
         {
+            _chargeCallCount++;
+
             if (_decline)
                 return GatewayChargeResult.Declined;
 
-            // Same ID will not create another charge.
+            // Prevent duplicate charges
             _charged.Add(paymentId);
 
-            // Simulate a lost gateway response.
-            if (_loseFirstResponse)
+            // Simulate lost gateway responses
+            if (_lostResponsesRemaining > 0)
             {
-                _loseFirstResponse = false;
+                _lostResponsesRemaining--;
                 return GatewayChargeResult.Pending;
             }
 
@@ -58,9 +69,16 @@ public sealed class FakePaymentGateway : IPaymentGateway
         get
         {
             lock (_lock)
-            {
                 return _charged.Count;
-            }
+        }
+    }
+
+    public int ChargeCallCount
+    {
+        get
+        {
+            lock (_lock)
+                return _chargeCallCount;
         }
     }
 }
