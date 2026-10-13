@@ -11,12 +11,7 @@ var notification = new Notification(
     Recipient: recipient
 );
 
-Console.WriteLine($"Notification created with ID: {notification.Id}");
-Console.WriteLine($"Notification for user: {notification.UserId}");
-Console.WriteLine($"Message: {notification.Message}");
-Console.WriteLine($"Recipient Email: {notification.Recipient.Email}");
-Console.WriteLine($"Recipient Phone Number: {notification.Recipient.PhoneNumber}");
-Console.WriteLine($"Recipient Device Token: {notification.Recipient.DeviceToken}"); 
+
 
 // Build the Email channel one layer at a time.
 INotificationChannel emailChannel =
